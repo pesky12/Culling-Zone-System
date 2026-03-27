@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c333ccfdd0cbdbc4ca30cef2dd6e6b9b, type: 3}
   m_Name: CameraCullingManager
   m_EditorClassIdentifier: 
-  serializedUdonProgramAsset: {fileID: 11400000, guid: e3a1cc79e7661fc4c83d9e2114a3508f, type: 2}
+  serializedUdonProgramAsset: {fileID: 11400000, guid: 864d330577cae324a9d9093e5a3c4443, type: 2}
   udonAssembly: 
   assemblyError: 
   sourceCsScript: {fileID: 11500000, guid: 0b4e37d8af204b946a606f0a53eb67a4, type: 3}
@@ -775,7 +775,7 @@ MonoBehaviour:
       Data: 50|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
-      Data: CameraCullingZone[], Assembly-CSharp
+      Data: CameraCullingZone[], com.pesky.box.cullingzone.Runtime
     - Name: 
       Entry: 8
       Data: 
@@ -1088,7 +1088,7 @@ MonoBehaviour:
       Data: 70|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
-      Data: CameraCullingZone, Assembly-CSharp
+      Data: CameraCullingZone, com.pesky.box.cullingzone.Runtime
     - Name: 
       Entry: 8
       Data: 
