@@ -1,0 +1,24 @@
+{
+  "name": "com.pesky.box.cullingzone",
+  "displayName": "Camera Culling Zone",
+  "version": "1.0.0",
+  "description": "Dynamic camera culling system for VRChat worlds with zone-based distance overrides and platform-specific settings.",
+  "unity": "2019.4",
+  "author": {
+    "name": "Pesky12"
+  },
+  "vpmDependencies": {
+    "com.vrchat.worlds": "3.5.x"
+  },
+  "keywords": [
+    "vrchat",
+    "udon",
+    "udonsharp",
+    "camera",
+    "culling",
+    "optimization"
+  ],
+  "license": "MIT",
+  "changelogUrl": "https://github.com/pesky12/com.pesky.box.cullingzone/releases",
+  "documentationUrl": "https://github.com/pesky12/com.pesky.box.cullingzone#readme"
+}

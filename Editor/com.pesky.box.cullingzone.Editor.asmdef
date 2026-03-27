@@ -1,0 +1,20 @@
+{
+  "name": "com.pesky.box.cullingzone.Editor",
+  "rootNamespace": "PeskyBox.CullingZone.Editor",
+  "references": [
+    "VRC.Udon",
+    "UdonSharp.Runtime",
+    "GUID:a7f3c9e2d1b84f6a8c9d0e1f2a3b4c5d"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
