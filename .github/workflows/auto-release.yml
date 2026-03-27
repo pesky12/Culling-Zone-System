@@ -60,10 +60,13 @@ jobs:
             PREV_TAG="initial commit"
           fi
           
+          # Generate changelog (removes @pesky12 attribution, keeps other contributors)
+          CHANGELOG=$(git log $RANGE --pretty=format:"- %s (@%an)" --no-merges | sed 's/ (@pesky12)//g' | head -50)
+          
           cat << EOF > release_notes.md
           ## 📦 What's Changed
           
-          $(git log $RANGE --pretty=format:"- %s (@%an)" --no-merges | sed 's/ (@pesky12)$//' | head -50)
+          ${CHANGELOG}
           
           ---
           
