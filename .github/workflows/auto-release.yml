@@ -60,11 +60,10 @@ jobs:
             PREV_TAG="initial commit"
           fi
           
-          # Generate fancy changelog
           cat << EOF > release_notes.md
           ## 📦 What's Changed
           
-          $(git log $RANGE --pretty=format:"- %s (@%an)" --no-merges | head -50)
+          $(git log $RANGE --pretty=format:"- %s (@%an)" --no-merges | sed 's/ (@pesky12)$//' | head -50)
           
           ---
           
