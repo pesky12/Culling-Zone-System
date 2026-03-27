@@ -5,13 +5,16 @@ on:
     branches: [master]
     paths: ['package.json']
 
+permissions:
+  contents: write
+  actions: write
+
 jobs:
   release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
-          token: ${{ secrets.VPM_LISTING }}
           fetch-depth: 0  # Full history for better changelog
       
       - name: Detect version change
@@ -92,8 +95,6 @@ jobs:
         with:
           tag_name: v${{ steps.version.outputs.new_version }}
           body_path: release_notes.md
-        env:
-          GITHUB_TOKEN: ${{ secrets.VPM_LISTING }}
       
       - name: Trigger downstream update
         if: steps.version.outputs.changed == 'true' && steps.tag.outputs.exists != 'true'
