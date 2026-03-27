@@ -1,0 +1,110 @@
+name: Auto Release on Version Bump
+
+on:
+  push:
+    branches: [master]
+    paths: ['package.json']
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.VPM_LISTING }}
+          fetch-depth: 0  # Full history for better changelog
+      
+      - name: Detect version change
+        id: version
+        run: |
+          # Get previous commit's version (before this push)
+          OLD_VERSION=$(git log -1 --pretty=format:'%H' HEAD~1 2>/dev/null | xargs -I{} git show {}:package.json 2>/dev/null | jq -r '.version' || echo "none")
+          NEW_VERSION=$(jq -r '.version' package.json)
+          
+          echo "old_version=$OLD_VERSION" >> $GITHUB_OUTPUT
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          
+          if [ "$OLD_VERSION" != "$NEW_VERSION" ]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "📋 Version changed: $OLD_VERSION → $NEW_VERSION"
+          else
+            echo "📋 No version change detected"
+          fi
+      
+      - name: Check if tag exists
+        if: steps.version.outputs.changed == 'true'
+        id: tag
+        run: |
+          if git rev-parse "v${{ steps.version.outputs.new_version }}" >/dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "⚠️ Tag v${{ steps.version.outputs.new_version }} already exists, skipping"
+          fi
+      
+      - name: Generate Release Notes
+        if: steps.version.outputs.changed == 'true' && steps.tag.outputs.exists != 'true'
+        id: notes
+        run: |
+          VERSION="${{ steps.version.outputs.new_version }}"
+          OLD_VERSION="${{ steps.version.outputs.old_version }}"
+          
+          # Determine commit range
+          if [ "$OLD_VERSION" != "none" ] && git rev-parse "v$OLD_VERSION" >/dev/null 2>&1; then
+            RANGE="v$OLD_VERSION..HEAD"
+            PREV_TAG="v$OLD_VERSION"
+          else
+            RANGE="HEAD~30..HEAD"
+            PREV_TAG="initial commit"
+          fi
+          
+          # Generate fancy changelog
+          cat << EOF > release_notes.md
+          ## 📦 What's Changed
+          
+          $(git log $RANGE --pretty=format:"- %s (@%an)" --no-merges | head -50)
+          
+          ## 👥 Contributors
+          
+          $(git log $RANGE --pretty=format:"- @%an" --no-merges | sort -u)
+          
+          ---
+          
+          **Full Changelog**: https://github.com/${{ github.repository }}/compare/${PREV_TAG}...v${VERSION}
+          EOF
+          
+          echo "📝 Release notes generated"
+          cat release_notes.md
+      
+      - name: Create tag
+        if: steps.version.outputs.changed == 'true' && steps.tag.outputs.exists != 'true'
+        run: |
+          VERSION="${{ steps.version.outputs.new_version }}"
+          
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "v$VERSION"
+          git push origin "v$VERSION"
+          
+          echo "🏷️ Created tag v$VERSION"
+      
+      - name: Create GitHub Release
+        if: steps.version.outputs.changed == 'true' && steps.tag.outputs.exists != 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.new_version }}
+          body_path: release_notes.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.VPM_LISTING }}
+      
+      - name: Trigger downstream update
+        if: steps.version.outputs.changed == 'true' && steps.tag.outputs.exists != 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.VPM_LISTING }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: 'pesky12',
+              repo: 'PeskyBox',
+              workflow_id: 'build-listing.yml',
+              ref: 'master',
+            })
+            console.log('✅ Triggered PeskyBox build-listing workflow')
