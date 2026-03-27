@@ -61,14 +61,10 @@ jobs:
           fi
           
           # Generate fancy changelog
-          CONTRIBUTORS=$(git log $RANGE --pretty=format:"%an" --no-merges | sort -u | grep -v "^pesky12$" | sed 's/^/- @/')
-          
           cat << EOF > release_notes.md
           ## 📦 What's Changed
           
           $(git log $RANGE --pretty=format:"- %s (@%an)" --no-merges | head -50)
-          
-          $(if [ -n "$CONTRIBUTORS" ]; then echo "## 👥 Contributors"; echo "$CONTRIBUTORS"; fi)
           
           ---
           
